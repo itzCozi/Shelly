@@ -1,12 +1,16 @@
+# TODO: Add a way to pass to arguments at once Example(echo "Jeep";cls)
+
 try:
   import os, sys
   import time
+  import random
 except Exception as e:
   print(f'ERROR: {e}')
   sys.exit(1)
 
 
 class vars:
+  version = '0.1 Pre-Alpha'  # Side project -> Github repo
   now = lambda: os.popen('time /t').read().replace('\n', '')
   output_log = []
   ticker = 0
@@ -186,39 +190,46 @@ class lib:
 
   def changeTheme():
     try:
-      if text.lower().split(' ')[1] == 'black':
-        background_color = '0'
-      if text.lower().split(' ')[1] == 'blue':
-        background_color = '1'
-      if text.lower().split(' ')[1] == 'green':
-        background_color = '2'
-      if text.lower().split(' ')[1] == 'cyan':
-        background_color = '3'
-      if text.lower().split(' ')[1] == 'red':
-        background_color = '4'
-      if text.lower().split(' ')[1] == 'purple':
-        background_color = '5'
-      if text.lower().split(' ')[1] == 'yellow':
-        background_color = '6'
-      if text.lower().split(' ')[1] == 'white':
-        background_color = '7'
+      if text.lower().split(' ')[1] == 'random':
+        background_color = random.randint(0, 7)
+        foreground_color = random.randint(0, 7)
 
-      if text.lower().split(' ')[2] == 'black':
-        foreground_color = '0'
-      if text.lower().split(' ')[2] == 'blue':
-        foreground_color = '1'
-      if text.lower().split(' ')[2] == 'green':
-        foreground_color = '2'
-      if text.lower().split(' ')[1] == 'cyan':
-        foreground_color = '3'
-      if text.lower().split(' ')[2] == 'red':
-        foreground_color = '4'
-      if text.lower().split(' ')[2] == 'purple':
-        foreground_color = '5'
-      if text.lower().split(' ')[2] == 'yellow':
-        foreground_color = '6'
-      if text.lower().split(' ')[2] == 'white':
-        foreground_color = '7'
+      if len(text.split(' ')) > 1:
+        if text.lower().split(' ')[1] == 'black':
+          background_color = '0'
+        if text.lower().split(' ')[1] == 'blue':
+          background_color = '1'
+        if text.lower().split(' ')[1] == 'green':
+          background_color = '2'
+        if text.lower().split(' ')[1] == 'cyan':
+          background_color = '3'
+        if text.lower().split(' ')[1] == 'red':
+          background_color = '4'
+        if text.lower().split(' ')[1] == 'purple':
+          background_color = '5'
+        if text.lower().split(' ')[1] == 'yellow':
+          background_color = '6'
+        if text.lower().split(' ')[1] == 'white':
+          background_color = '7'
+
+      if len(text.split(' ')) > 2:
+        if text.lower().split(' ')[2] == 'black':
+          foreground_color = '0'
+        if text.lower().split(' ')[2] == 'blue':
+          foreground_color = '1'
+        if text.lower().split(' ')[2] == 'green':
+          foreground_color = '2'
+        if text.lower().split(' ')[1] == 'cyan':
+          foreground_color = '3'
+        if text.lower().split(' ')[2] == 'red':
+          foreground_color = '4'
+        if text.lower().split(' ')[2] == 'purple':
+          foreground_color = '5'
+        if text.lower().split(' ')[2] == 'yellow':
+          foreground_color = '6'
+        if text.lower().split(' ')[2] == 'white':
+          foreground_color = '7'
+
       if 'background_color' and 'foreground_color' in locals():
         os.system(f'Color {background_color}{foreground_color}')
       else:
@@ -275,6 +286,21 @@ if __name__ == '__main__':
           lib.changeTheme()
         else:
           print('Please pass 2 colors, Example(::theme blue white).')
+
+      # SPECIAL SWITCHES #
+      elif text.lower() == '::_logged':
+        print('\n'.join(vars.output_log))
+
+      elif text.lower() == '::_version':
+        if __file__.endswith('.exe'):
+          mode = 'COMPILED'
+        elif __file__.endswith('.pyc'):
+          mode = 'PY-COMPILED'
+        elif __file__.endswith('.pyc'):
+          mode = 'COMPILED-MODULE'
+        elif __file__.endswith('.py'):
+          mode = 'INTERPRETED'
+        print(f'{vars.version} | {mode}')
 
       else:
         vars.output_log.append(text)
