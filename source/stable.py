@@ -1,15 +1,14 @@
-# THIS FILE IS RESERVED FOR RECENT AND FUNCTIONAL CODE THAT HAS BEEN FORMATTED
-# HOW-TO-FORMAT: python -m black <FILE-NAME> | https://github.com/psf/black
-
 try:
     import os, sys
     import time
+    import random
 except Exception as e:
     print(f"ERROR: {e}")
     sys.exit(1)
 
 
 class vars:
+    version = "0.2 Pre-Alpha"  # Side project -> Github repo
     now = lambda: os.popen("time /t").read().replace("\n", "")
     output_log = []
     ticker = 0
@@ -190,39 +189,46 @@ class lib:
 
     def changeTheme():
         try:
-            if text.lower().split(" ")[1] == "black":
-                background_color = "0"
-            if text.lower().split(" ")[1] == "blue":
-                background_color = "1"
-            if text.lower().split(" ")[1] == "green":
-                background_color = "2"
-            if text.lower().split(" ")[1] == "cyan":
-                background_color = "3"
-            if text.lower().split(" ")[1] == "red":
-                background_color = "4"
-            if text.lower().split(" ")[1] == "purple":
-                background_color = "5"
-            if text.lower().split(" ")[1] == "yellow":
-                background_color = "6"
-            if text.lower().split(" ")[1] == "white":
-                background_color = "7"
+            if text.lower().split(" ")[1] == "random":
+                background_color = random.randint(0, 7)
+                foreground_color = random.randint(0, 7)
 
-            if text.lower().split(" ")[2] == "black":
-                foreground_color = "0"
-            if text.lower().split(" ")[2] == "blue":
-                foreground_color = "1"
-            if text.lower().split(" ")[2] == "green":
-                foreground_color = "2"
-            if text.lower().split(" ")[1] == "cyan":
-                foreground_color = "3"
-            if text.lower().split(" ")[2] == "red":
-                foreground_color = "4"
-            if text.lower().split(" ")[2] == "purple":
-                foreground_color = "5"
-            if text.lower().split(" ")[2] == "yellow":
-                foreground_color = "6"
-            if text.lower().split(" ")[2] == "white":
-                foreground_color = "7"
+            if len(text.split(" ")) > 1:
+                if text.lower().split(" ")[1] == "black":
+                    background_color = "0"
+                if text.lower().split(" ")[1] == "blue":
+                    background_color = "1"
+                if text.lower().split(" ")[1] == "green":
+                    background_color = "2"
+                if text.lower().split(" ")[1] == "cyan":
+                    background_color = "3"
+                if text.lower().split(" ")[1] == "red":
+                    background_color = "4"
+                if text.lower().split(" ")[1] == "purple":
+                    background_color = "5"
+                if text.lower().split(" ")[1] == "yellow":
+                    background_color = "6"
+                if text.lower().split(" ")[1] == "white":
+                    background_color = "7"
+
+            if len(text.split(" ")) > 2:
+                if text.lower().split(" ")[2] == "black":
+                    foreground_color = "0"
+                if text.lower().split(" ")[2] == "blue":
+                    foreground_color = "1"
+                if text.lower().split(" ")[2] == "green":
+                    foreground_color = "2"
+                if text.lower().split(" ")[1] == "cyan":
+                    foreground_color = "3"
+                if text.lower().split(" ")[2] == "red":
+                    foreground_color = "4"
+                if text.lower().split(" ")[2] == "purple":
+                    foreground_color = "5"
+                if text.lower().split(" ")[2] == "yellow":
+                    foreground_color = "6"
+                if text.lower().split(" ")[2] == "white":
+                    foreground_color = "7"
+
             if "background_color" and "foreground_color" in locals():
                 os.system(f"Color {background_color}{foreground_color}")
             else:
@@ -280,6 +286,25 @@ if __name__ == "__main__":
                 else:
                     print("Please pass 2 colors, Example(::theme blue white).")
 
+            # SPECIAL SWITCHES #
+            elif text.lower() == "::_logged":
+                print("\n".join(vars.output_log))
+
+            elif text.lower() == "::_version":
+                extension = __file__.split("\\")[-1][
+                    __file__.split("\\")[-1].find(".") :
+                ]
+                # Gave me a headache coding such a stupid one liner
+                if extension == ".exe":
+                    mode = "COMPILED"
+                if extension == ".pyc":
+                    mode = "PY-COMPILED"
+                if extension == ".dll":
+                    mode = "COMPILED-MODULE"
+                if extension == ".py":
+                    mode = "INTERPRETED"
+                print(f"{vars.version} | {extension}")
+
             else:
                 vars.output_log.append(text)
 
@@ -289,5 +314,4 @@ if __name__ == "__main__":
 
 else:
     print(f"You can't import {__file__} you must run it.")
-    time.sleep(3)
     sys.exit(1)

@@ -1,5 +1,3 @@
-# TODO: Add a way to pass to arguments at once Example(echo "Jeep";cls)
-
 try:
   import os, sys
   import time
@@ -10,7 +8,7 @@ except Exception as e:
 
 
 class vars:
-  version = '0.1 Pre-Alpha'  # Side project -> Github repo
+  version = '0.2 Pre-Alpha'  # Side project -> Github repo
   now = lambda: os.popen('time /t').read().replace('\n', '')
   output_log = []
   ticker = 0
@@ -292,15 +290,19 @@ if __name__ == '__main__':
         print('\n'.join(vars.output_log))
 
       elif text.lower() == '::_version':
-        if __file__.endswith('.exe'):
+        extension = __file__.split('\\')[-1][__file__.split('\\')[-1].find('.'):]
+        # Gave me a headache coding such a stupid one liner
+        directory = '/'.join(__file__.split('\\')[:-1])
+        mode = extension
+        if extension == '.exe':
           mode = 'COMPILED'
-        elif __file__.endswith('.pyc'):
+        if extension == '.pyc':
           mode = 'PY-COMPILED'
-        elif __file__.endswith('.pyc'):
+        if extension == '.dll':
           mode = 'COMPILED-MODULE'
-        elif __file__.endswith('.py'):
+        if extension == '.py':
           mode = 'INTERPRETED'
-        print(f'{vars.version} | {mode}')
+        print(f'{vars.version} | {mode} at {directory}')
 
       else:
         vars.output_log.append(text)
@@ -311,5 +313,4 @@ if __name__ == '__main__':
 
 else:
   print(f"You can't import {__file__} you must run it.")
-  time.sleep(3)
   sys.exit(1)
