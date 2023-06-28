@@ -1,3 +1,5 @@
+# This is written in kinda my own style with the help of the relpit formatter
+
 try:
   import os, sys
   import time
@@ -8,9 +10,10 @@ except Exception as e:
 
 
 class vars:
-  version = '0.2 Pre-Alpha'  # Side project -> Github repo
+  version = '0.3 Pre-Alpha'  # Side project -> Github repo
   now = lambda: os.popen('time /t').read().replace('\n', '')
   output_log = []
+  user_vars = []
   ticker = 0
 
 
@@ -19,6 +22,18 @@ class lib:
   def clearPad():
     os.system('cls')
     vars.ticker = 0
+
+  def createVar(text):
+    if len(text.split(' ')) == 4:
+      var_name = str(text.split(' ')[1])
+      var_value = str(text.split(' ')[3])
+    else:
+      print('No value provided, Example(::var food = pizza).')
+
+    if 'var_name' and 'var_value' in locals():
+      varOBJ = f'{var_name} = {var_value}'
+      vars.user_vars.append(varOBJ)
+      print(f'Typing <{var_name}> will replace it with {var_value}.')
 
   def stall():
     if len(text.lower().split(' ')) > 1:
@@ -139,15 +154,38 @@ class lib:
           if text.lower() == '::close':
             print(f'Closed: {file}')
             break
+          elif text.lower().split(' ')[0] == '::var':
+            lib.createVar(text)
+          elif text.lower().split(' ')[0] == '::wipe':
+            YorN = input('Are you sure you want to wipe this file? (y/n) ')
+            if YorN.lower() == 'yes' or YorN.lower() == 'y':
+              open(path, 'w')
+              print(f'Wiped: {file}')
+            elif YorN.lower() == 'no' or YorN.lower() == 'n':
+              print('Aborting...')
+              time.sleep(1)
+            else:
+              print('Given input not recognized, aborting...')
           elif '::' in text.lower():
-            print("Only the '::close' command is valid in write mode.")
+            print("Only the '::close', '::wipe' and '::var' command's are valid in write mode.")
           else:
+            for item in text.split(' '):  # Checks for vars in text and replaces them
+              if '<' and '>' in item:
+                var_start = item.find('<')
+                var_end = item.find('>')
+                var = item[var_start:var_end].replace('<','').replace('>','')
+                for i in vars.user_vars:
+                  if var in i:
+                    ripped_statement = vars.user_vars[vars.user_vars.index(i)]
+                    value = ripped_statement.split(' ')[2]
+                if 'value' in locals():
+                  text = text.replace(var, value).replace('<','').replace('>','')
             if os.path.getsize(path) == 0:
-              writeback = f'{text}'
+              write_back = f'{text}'
             if os.path.getsize(path) != 0:
-              writeback = f'\n{text}'
+              write_back = f'\n{text}'
             with open(path, 'a') as out:
-              out.write(writeback)
+              out.write(write_back)
 
       if directory == '':
         if os.path.exists(f'{os.getcwd()}/{file}'):
@@ -228,7 +266,7 @@ class lib:
         if text.lower().split(' ')[2] == 'white':
           foreground_color = '7'
 
-      if 'background_color' and 'foreground_color' in locals():
+      if 'background_color' and 'foreground_color' in locals():  # Prevent unbound error
         os.system(f'Color {background_color}{foreground_color}')
       else:
         print('Given color not recognized, Example(::theme blue white).')
@@ -293,7 +331,7 @@ if __name__ == '__main__':
         extension = __file__.split('\\')[-1][__file__.split('\\')[-1].find('.'):]
         # Gave me a headache coding such a stupid one liner
         directory = '/'.join(__file__.split('\\')[:-1])
-        mode = extension
+        mode = extension  # Incase none of the below statements are true
         if extension == '.exe':
           mode = 'COMPILED'
         if extension == '.pyc':

@@ -1,3 +1,5 @@
+# ALL CODE COMMITED TO THIS FILE IS FORMATTED TO BLACK-PYTHON (SEE README BADGE)
+
 try:
     import os, sys
     import time
