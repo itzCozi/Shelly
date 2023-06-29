@@ -1,4 +1,4 @@
-# This is written in kinda my own style with the help of the relpit formatter
+# This is written in kinda my own style with the help of the replit Python formatter
 
 try:
   import os, sys
@@ -18,6 +18,31 @@ class vars:
 
 
 class lib:
+
+  def help():
+    print(f'''
+------------------ Shelly Arguments ------------------
+  ::quit - This will quit the program.
+  ::clear - Wipes the console clean.
+  ::time - Displays the time.
+  ::stall(secs) - Waits a provided amount of seconds.
+  ::save(file) - Saves all text to a file.
+  ::load(file) - Load text from a file.
+  ::log(text) - Writes given text to the console.
+  ::system(cmd) - Passes a command to the computer.
+  ::theme(color color) - Changes the console's color.
+  ::open(file) - Displays file contents and writes all lines to file.
+  ::close - Exits file and returns to normal mode.
+  ::wipe - Clears all data from current file.
+  ::var(name = value) - Set a variable to a value, type <name> to replace it with value.
+  
+ All arguments must start with '::' unless it is a special switch then it starts with '::_' though these switches
+ are not documented. Once inside an open file you can use just the final three commands and nothing else, only 
+ '::var', '::wipe' and '::close' are valid at that time, however after '::close' is passed all commands 
+ are usable outside files. The '::load' and '::save' commands have optional parameters like files, if you
+ wanted to save to a file called 'Log2.txt' type this: "::save Log2.txt" but typing: '::save' will default
+ to current directory/save.txt, The load command will default to this location too if no arguments are given.
+    ''')
 
   def clearPad():
     os.system('cls')
@@ -173,13 +198,13 @@ class lib:
               if '<' and '>' in item:
                 var_start = item.find('<')
                 var_end = item.find('>')
-                var = item[var_start:var_end].replace('<','').replace('>','')
+                var = item[var_start:var_end].replace('<', '').replace('>', '')
                 for i in vars.user_vars:
                   if var in i:
                     ripped_statement = vars.user_vars[vars.user_vars.index(i)]
                     value = ripped_statement.split(' ')[2]
                 if 'value' in locals():
-                  text = text.replace(var, value).replace('<','').replace('>','')
+                  text = text.replace(var, value).replace('<', '').replace('>', '')
             if os.path.getsize(path) == 0:
               write_back = f'{text}'
             if os.path.getsize(path) != 0:
@@ -283,7 +308,10 @@ if __name__ == '__main__':
       text = input(f'{vars.ticker}. ')
 
       # ARGUMENT HANDLER #
-      if text.lower() == '::quit':
+      if text.lower() == '::help':
+        lib.help()
+
+      elif text.lower() == '::quit':
         lib.quitProcess()
 
       elif text.lower() == '::clear':
@@ -341,6 +369,9 @@ if __name__ == '__main__':
         if extension == '.py':
           mode = 'INTERPRETED'
         print(f'{vars.version} | {mode} at {directory}')
+
+      elif '::' in text.lower().split(' ')[0]:
+        print(f'The given command {text.lower().split(" ")[0]} is not valid in this mode, try opening a file.')
 
       else:
         vars.output_log.append(text)
