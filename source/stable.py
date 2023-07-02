@@ -10,16 +10,56 @@ except Exception as e:
 
 
 class vars:
-    version = "0.2 Pre-Alpha"  # Side project -> Github repo
+    version = "0.3 Pre-Alpha"  # Side project -> Github repo
     now = lambda: os.popen("time /t").read().replace("\n", "")
     output_log = []
+    user_vars = []
     ticker = 0
 
 
 class lib:
+    def help():
+        print(
+            f"""
+------------------ Shelly Arguments ------------------
+  ::quit - This will quit the program.
+  ::clear - Wipes the console clean.
+  ::time - Displays the time.
+  ::stall(secs) - Waits a provided amount of seconds.
+  ::save(file) - Saves all text to a file.
+  ::load(file) - Load text from a file.
+  ::log(text) - Writes given text to the console.
+  ::system(cmd) - Passes a command to the computer.
+  ::theme(color color) - Changes the console's color.
+  ::open(file) - Displays file contents and writes all lines to file.
+  ::close - Exits file and returns to normal mode.
+  ::wipe - Clears all data from current file.
+  ::var(name = value) - Set a variable to a value, type <name> to replace it with value.
+  
+ All arguments must start with '::' unless it is a special switch then it starts with '::_' though these switches
+ are not documented. Once inside an open file you can use just the final three commands and nothing else, only 
+ '::var', '::wipe' and '::close' are valid at that time, however after '::close' is passed all commands 
+ are usable outside files. The '::load' and '::save' commands have optional parameters like files, if you
+ wanted to save to a file called 'Log2.txt' type this: "::save Log2.txt" but typing: '::save' will default
+ to current directory/save.txt, The load command will default to this location too if no arguments are given.
+    """
+        )
+
     def clearPad():
         os.system("cls")
         vars.ticker = 0
+
+    def createVar(text):
+        if len(text.split(" ")) == 4:
+            var_name = str(text.split(" ")[1])
+            var_value = str(text.split(" ")[3])
+        else:
+            print("No value provided, Example(::var food = pizza).")
+
+        if "var_name" and "var_value" in locals():
+            varOBJ = f"{var_name} = {var_value}"
+            vars.user_vars.append(varOBJ)
+            print(f"Typing <{var_name}> will replace it with {var_value}.")
 
     def stall():
         if len(text.lower().split(" ")) > 1:
@@ -142,15 +182,52 @@ class lib:
                     if text.lower() == "::close":
                         print(f"Closed: {file}")
                         break
+                    elif text.lower().split(" ")[0] == "::var":
+                        lib.createVar(text)
+                    elif text.lower().split(" ")[0] == "::wipe":
+                        YorN = input("Are you sure you want to wipe this file? (y/n) ")
+                        if YorN.lower() == "yes" or YorN.lower() == "y":
+                            open(path, "w")
+                            print(f"Wiped: {file}")
+                        elif YorN.lower() == "no" or YorN.lower() == "n":
+                            print("Aborting...")
+                            time.sleep(1)
+                        else:
+                            print("Given input not recognized, aborting...")
                     elif "::" in text.lower():
-                        print("Only the '::close' command is valid in write mode.")
+                        print(
+                            "Only the '::close', '::wipe' and '::var' command's are valid in write mode."
+                        )
                     else:
+                        for item in text.split(
+                            " "
+                        ):  # Checks for vars in text and replaces them
+                            if "<" and ">" in item:
+                                var_start = item.find("<")
+                                var_end = item.find(">")
+                                var = (
+                                    item[var_start:var_end]
+                                    .replace("<", "")
+                                    .replace(">", "")
+                                )
+                                for i in vars.user_vars:
+                                    if var in i:
+                                        ripped_statement = vars.user_vars[
+                                            vars.user_vars.index(i)
+                                        ]
+                                        value = ripped_statement.split(" ")[2]
+                                if "value" in locals():
+                                    text = (
+                                        text.replace(var, value)
+                                        .replace("<", "")
+                                        .replace(">", "")
+                                    )
                         if os.path.getsize(path) == 0:
-                            writeback = f"{text}"
+                            write_back = f"{text}"
                         if os.path.getsize(path) != 0:
-                            writeback = f"\n{text}"
+                            write_back = f"\n{text}"
                         with open(path, "a") as out:
-                            out.write(writeback)
+                            out.write(write_back)
 
             if directory == "":
                 if os.path.exists(f"{os.getcwd()}/{file}"):
@@ -231,7 +308,9 @@ class lib:
                 if text.lower().split(" ")[2] == "white":
                     foreground_color = "7"
 
-            if "background_color" and "foreground_color" in locals():
+            if (
+                "background_color" and "foreground_color" in locals()
+            ):  # Prevent unbound error
                 os.system(f"Color {background_color}{foreground_color}")
             else:
                 print("Given color not recognized, Example(::theme blue white).")
@@ -248,7 +327,10 @@ if __name__ == "__main__":
             text = input(f"{vars.ticker}. ")
 
             # ARGUMENT HANDLER #
-            if text.lower() == "::quit":
+            if text.lower() == "::help":
+                lib.help()
+
+            elif text.lower() == "::quit":
                 lib.quitProcess()
 
             elif text.lower() == "::clear":
@@ -297,6 +379,8 @@ if __name__ == "__main__":
                     __file__.split("\\")[-1].find(".") :
                 ]
                 # Gave me a headache coding such a stupid one liner
+                directory = "/".join(__file__.split("\\")[:-1])
+                mode = extension  # Incase none of the below statements are true
                 if extension == ".exe":
                     mode = "COMPILED"
                 if extension == ".pyc":
@@ -305,7 +389,12 @@ if __name__ == "__main__":
                     mode = "COMPILED-MODULE"
                 if extension == ".py":
                     mode = "INTERPRETED"
-                print(f"{vars.version} | {extension}")
+                print(f"{vars.version} | {mode} at {directory}")
+
+            elif "::" in text.lower().split(" ")[0]:
+                print(
+                    f'The given command {text.lower().split(" ")[0]} is not valid in this mode, try opening a file.'
+                )
 
             else:
                 vars.output_log.append(text)
