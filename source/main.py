@@ -12,6 +12,7 @@ except Exception as e:
 class vars:
   version = '0.3 Pre-Alpha'  # Side project -> Github repo
   now = lambda: os.popen('time /t').read().replace('\n', '')
+  platform = sys.platform
   output_log = []
   user_vars = []
   ticker = 0
@@ -47,6 +48,37 @@ class lib:
   def clearPad():
     os.system('cls')
     vars.ticker = 0
+
+  def checks():
+    # Add a way for users to create a simple file like 'config' that when detected
+    # will apply the given settings before lanuch so like changing the theme or
+    # removing the numer ticks or disabling system commands
+    if 'linux' in vars.platform:
+      print(f"\n------------------------------------------------ \
+      \nTHIS PROGRAM IS ONLY COMPATIBLE WITH WINDOWS. \
+      \nSOME ISSUES MAY BE ENCOUNTERED, CONTINUE? \
+      \n------------------------------------------------")
+      user_input = input('(y/n)> ')
+      if user_input.lower() == 'y' or user_input.lower() == 'yes':
+        print('\nYIELDING...')
+        vars.platform = 'yielded'
+      elif user_input.lower() == 'n' or user_input.lower() == 'no':
+        print('\nQUITTING...')
+        sys.exit(1)
+      else:
+        print('Given input not recognized, quitting...')
+        sys.exit(0)
+    elif os.path.exists(f'{os.getcwd}/startup.py') or os.path.exists(f'{os.getcwd}/startup.exe'):
+      user_input = input(f'A startup file has been found, run it? (y/n) ')
+      if user_input.lower() == 'y' or user_input.lower() == 'yes':
+        print('Running: startup.py')
+        os.startfile(f'{os.getcwd}/startup.py')
+      elif user_input.lower() == 'n' or user_input.lower() == 'no':
+        print('Aborting...')
+        time.sleep(1)
+      else:
+        print('Given input not recognized, quitting...')
+        sys.exit(0)
 
   def createVar(text):
     if len(text.split(' ')) == 4:
@@ -303,6 +335,7 @@ class lib:
 
 if __name__ == '__main__':
   try:
+    lib.checks()  # Handles pre-run
     while True:
       vars.ticker += 1
       text = input(f'{vars.ticker}. ')
