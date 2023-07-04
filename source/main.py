@@ -13,6 +13,8 @@ class vars:
   version = '0.3 Pre-Alpha'  # Side project -> Github repo
   now = lambda: os.popen('time /t').read().replace('\n', '')
   platform = sys.platform
+  disable_commands = None
+  disable_ticks = None
   output_log = []
   user_vars = []
   ticker = 0
@@ -52,7 +54,7 @@ class lib:
   def checks():
     # Add a way for users to create a simple file like 'config' that when detected
     # will apply the given settings before lanuch so like changing the theme or
-    # removing the numer ticks or disabling system commands
+    # removing the numer ticks or disabling system commands EDIT: ln(50~90)
     if 'linux' in vars.platform:
       print(f"\n------------------------------------------------ \
       \nTHIS PROGRAM IS ONLY COMPATIBLE WITH WINDOWS. \
@@ -69,16 +71,29 @@ class lib:
         print('Given input not recognized, quitting...')
         sys.exit(0)
     elif os.path.exists(f'{os.getcwd()}/config'):
-      user_input = input(f'A startup file has been found, run it? (y/n) ')
-      if user_input.lower() == 'y' or user_input.lower() == 'yes':
-        print('Running: startup.py')
-        os.startfile(f'{os.getcwd}/startup.py')
-      elif user_input.lower() == 'n' or user_input.lower() == 'no':
-        print('Aborting...')
-        time.sleep(1)
-      else:
-        print('Given input not recognized, quitting...')
-        sys.exit(0)
+      # theme: blue white     (IMPLEMENTED)
+      # number-ticks: false   (IMPLEMENTED)
+      # commands: false       (IMPLEMENTED)
+      with open('config', 'r') as f:
+        content = f.read()
+        f.close()
+
+      for line in content.split('\n'):
+        if 'theme' in line:
+          index = line.find(': ')
+          theme_settings = line[index:].replace(': ', '')
+          colorA = theme_settings.split(' ')[0]
+          colorB = theme_settings.split(' ')[1]
+          parameter = f'::theme {colorA} {colorB}'
+          lib.changeTheme(parameter)
+        if 'number-ticks' in line:
+          index = line.find(': ')
+          boolean = line[index:].replace(': ', '')
+          vars.disable_ticks = bool(boolean)
+        if 'commands' in line:
+          index = line.find(': ')
+          boolean = line[index:].replace(': ', '')
+          vars.disable_commands = bool(boolean)
 
   def createVar(text):
     if len(text.split(' ')) == 4:
@@ -207,7 +222,10 @@ class lib:
       def openLoop():
         while True:
           vars.ticker += 1
-          text = input(f'{vars.ticker}. ')
+          if vars.disable_ticks == True:
+            text = input(f'{vars.ticker}. ')
+          else:
+            text = input('> ')
           if text.lower() == '::close':
             print(f'Closed: {file}')
             break
@@ -281,46 +299,52 @@ class lib:
       time.sleep(3)
       return 0
 
-  def changeTheme():
+  def changeTheme(param=None):
+    # I coded this so param and text are interchangeable to account for cases where
+    # the user may not have typed yet so like config theme switches
+    if not 'text' in locals():
+      text = param
+    elif not 'param' in locals():
+      param = text
     try:
-      if text.lower().split(' ')[1] == 'random':
+      if text.lower().split(' ')[1] == 'random' or param.lower().split(' ')[1] == 'random':
         background_color = random.randint(0, 7)
         foreground_color = random.randint(0, 7)
 
       if len(text.split(' ')) > 1:
-        if text.lower().split(' ')[1] == 'black':
+        if text.lower().split(' ')[1] == 'black' or param.lower().split(' ')[1] == 'black':
           background_color = '0'
-        if text.lower().split(' ')[1] == 'blue':
+        if text.lower().split(' ')[1] == 'blue' or param.lower().split(' ')[1] == 'blue':
           background_color = '1'
-        if text.lower().split(' ')[1] == 'green':
+        if text.lower().split(' ')[1] == 'green' or param.lower().split(' ')[1] == 'green':
           background_color = '2'
-        if text.lower().split(' ')[1] == 'cyan':
+        if text.lower().split(' ')[1] == 'cyan' or param.lower().split(' ')[1] == 'cyan':
           background_color = '3'
-        if text.lower().split(' ')[1] == 'red':
+        if text.lower().split(' ')[1] == 'red' or param.lower().split(' ')[1] == 'red':
           background_color = '4'
-        if text.lower().split(' ')[1] == 'purple':
+        if text.lower().split(' ')[1] == 'purple' or param.lower().split(' ')[1] == 'purple':
           background_color = '5'
-        if text.lower().split(' ')[1] == 'yellow':
+        if text.lower().split(' ')[1] == 'yellow' or param.lower().split(' ')[1] == 'yellow':
           background_color = '6'
-        if text.lower().split(' ')[1] == 'white':
+        if text.lower().split(' ')[1] == 'white' or param.lower().split(' ')[1] == 'white':
           background_color = '7'
 
       if len(text.split(' ')) > 2:
-        if text.lower().split(' ')[2] == 'black':
+        if text.lower().split(' ')[2] == 'black' or param.lower().split(' ')[2] == 'black':
           foreground_color = '0'
-        if text.lower().split(' ')[2] == 'blue':
+        if text.lower().split(' ')[2] == 'blue' or param.lower().split(' ')[2] == 'blue':
           foreground_color = '1'
-        if text.lower().split(' ')[2] == 'green':
+        if text.lower().split(' ')[2] == 'green' or param.lower().split(' ')[2] == 'green':
           foreground_color = '2'
-        if text.lower().split(' ')[1] == 'cyan':
+        if text.lower().split(' ')[1] == 'cyan' or param.lower().split(' ')[2] == 'cyan':
           foreground_color = '3'
-        if text.lower().split(' ')[2] == 'red':
+        if text.lower().split(' ')[2] == 'red' or param.lower().split(' ')[2] == 'red':
           foreground_color = '4'
-        if text.lower().split(' ')[2] == 'purple':
+        if text.lower().split(' ')[2] == 'purple' or param.lower().split(' ')[2] == 'purple':
           foreground_color = '5'
-        if text.lower().split(' ')[2] == 'yellow':
+        if text.lower().split(' ')[2] == 'yellow' or param.lower().split(' ')[2] == 'yellow':
           foreground_color = '6'
-        if text.lower().split(' ')[2] == 'white':
+        if text.lower().split(' ')[2] == 'white' or param.lower().split(' ')[2] == 'white':
           foreground_color = '7'
 
       if 'background_color' and 'foreground_color' in locals():  # Prevent unbound error
@@ -338,7 +362,12 @@ if __name__ == '__main__':
     lib.checks()  # Handles pre-run
     while True:
       vars.ticker += 1
-      text = input(f'{vars.ticker}. ')
+      # On Linux when i was testing this i removed the lines from the file and the else
+      # statement ran not the if statement same with the system commands but not theme...
+      if vars.disable_ticks == True:
+        text = input(f'{vars.ticker}. ')
+      else:
+        text = input('> ')
 
       # ARGUMENT HANDLER #
       if text.lower() == '::help':
@@ -372,11 +401,16 @@ if __name__ == '__main__':
           print('No string provided, Example(::log Python Is Better).')
 
       elif text.lower().split(' ')[0] == '::system':
-        if len(text.split(' ')) > 1:
-          command = ' '.join(text.lower().split(' ')[1:])
-          os.system(command)
+        if vars.disable_commands == False:
+          if len(text.split(' ')) > 1:
+            command = ' '.join(text.lower().split(' ')[1:])
+            os.system(command)
+          else:
+            print('No command given, Example(::system time /t).')
         else:
-          print('No command given, Example(::system time /t).')
+          print('System commands have been disabled by configuration, create \
+          \na config file and type (commands: false) without parentheses \
+          \nto enable them or delete the file.')
 
       elif text.lower().split(' ')[0] == '::theme':
         if len(text.split(' ')) > 1:
