@@ -13,7 +13,7 @@ except Exception as e:
 class vars:
   version = '0.3 Pre-Alpha'  # Side project -> Github repo
   now = lambda: os.popen('time /t').read().replace('\n', '')
-  config_file = f'{os.getcwd()}/config'  # Used by checks()
+  config_file = f'{os.getcwd()}/config'.replace('\\', '/')
   platform = sys.platform
   # NULL is a string placeholder for None
   disable_commands = 'NULL'
@@ -87,9 +87,13 @@ class lib:
         if 'theme' in line:
           index = line.find(': ')
           theme_settings = line[index:].replace(': ', '')
-          colorA = theme_settings.split(' ')[0]
-          colorB = theme_settings.split(' ')[1]
-          parameter = f'::theme {colorA} {colorB}'
+          if len(theme_settings.split(' ')) == 2:
+            colorA = theme_settings.split(' ')[0]
+            colorB = theme_settings.split(' ')[1]
+            parameter = f'::theme {colorA} {colorB}'
+          else:
+            colorA = theme_settings.split(' ')[0]
+            parameter = f'::theme {colorA}'
           lib.changeTheme(parameter)
         if 'number-ticks' in line:
           index = line.find(': ')
@@ -304,7 +308,7 @@ class lib:
       time.sleep(3)
       return 0
 
-  def changeTheme(param=None):
+  def changeTheme(param):
     # I coded this so param and text are interchangeable to account for cases where
     # the user may not have typed yet so like configured theme switches
     if not 'text' in locals():
@@ -316,7 +320,7 @@ class lib:
         background_color = random.randint(0, 7)
         foreground_color = random.randint(0, 7)
 
-      if len(text.split(' ')) > 1:
+      if len(text.split(' ')) > 1 or len(param.split(' ')) > 1:
         if text.lower().split(' ')[1] == 'black' or param.lower().split(' ')[1] == 'black':
           background_color = '0'
         if text.lower().split(' ')[1] == 'blue' or param.lower().split(' ')[1] == 'blue':
@@ -334,7 +338,7 @@ class lib:
         if text.lower().split(' ')[1] == 'white' or param.lower().split(' ')[1] == 'white':
           background_color = '7'
 
-      if len(text.split(' ')) > 2:
+      if len(text.split(' ')) > 2 or len(param.split(' ')) > 2:
         if text.lower().split(' ')[2] == 'black' or param.lower().split(' ')[2] == 'black':
           foreground_color = '0'
         if text.lower().split(' ')[2] == 'blue' or param.lower().split(' ')[2] == 'blue':
@@ -419,7 +423,7 @@ if __name__ == '__main__':
 
       elif text.lower().split(' ')[0] == '::theme':
         if len(text.split(' ')) > 1:
-          lib.changeTheme()
+          lib.changeTheme(text)
         else:
           print('Please pass 2 colors, Example(::theme blue white).')
 
