@@ -1,5 +1,5 @@
 # This is written in kinda my own style with the help of the replit Python formatter
-# TODO: Maybe add a way for the user to print the repr of any variable or object
+# TODO: Add a way for the user to print all user made vars in an opened file
 
 try:
   import os, sys
@@ -209,7 +209,10 @@ class lib:
         for line in content.splitlines():
           vars.ticker += 1
           vars.output_log.append(line)
-          print(f'{vars.ticker}. {line}')
+          if vars.disable_ticks.lower() == 'true' or vars.disable_ticks == 'NULL':
+            print(f'{vars.ticker}. {line}')
+          else:
+            print(f'> {line}')
         save.close()
       print(f'Loaded text from {save_file}')
     else:
@@ -231,7 +234,7 @@ class lib:
       def openLoop():
         while True:
           vars.ticker += 1
-          if vars.disable_ticks == True:
+          if vars.disable_ticks.lower() == 'true' or vars.disable_ticks == 'NULL':
             text = input(f'{vars.ticker}. ')
           else:
             text = input('> ')
@@ -278,7 +281,10 @@ class lib:
             content = r.read()
             for line in content.splitlines():
               vars.ticker += 1
-              print(f'{vars.ticker}. {line}')
+              if vars.disable_ticks.lower() == 'true' or vars.disable_ticks == 'NULL':
+                print(f'{vars.ticker}. {line}')
+              else:
+                print(f'> {line}')
           openLoop()
 
         if not os.path.exists(file):
@@ -292,7 +298,10 @@ class lib:
             content = r.read()
             for line in content.splitlines():
               vars.ticker += 1
-              print(f'{vars.ticker}. {line}')
+              if vars.disable_ticks.lower() == 'true' or vars.disable_ticks == 'NULL':
+                print(f'{vars.ticker}. {line}')
+              else:
+                print(f'> {line}')
           openLoop()
 
         if not os.path.exists(file):
@@ -316,6 +325,7 @@ class lib:
     elif not 'param' in locals():
       param = text
     try:
+      # Cover your eyes! i'll tell you when it's over.
       if text.lower().split(' ')[1] == 'random' or param.lower().split(' ')[1] == 'random':
         background_color = random.randint(0, 7)
         foreground_color = random.randint(0, 7)
@@ -355,7 +365,8 @@ class lib:
           foreground_color = '6'
         if text.lower().split(' ')[2] == 'white' or param.lower().split(' ')[2] == 'white':
           foreground_color = '7'
-
+      # It's over now, you can open your eyes.
+      
       if 'background_color' and 'foreground_color' in locals():  # Prevent unbound error
         os.system(f'Color {background_color}{foreground_color}')
       else:
@@ -371,11 +382,9 @@ if __name__ == '__main__':
     lib.checks()  # Handles pre-run
     while True:
       vars.ticker += 1
-      # On Linux when i was testing this i removed the lines from the file and the else
-      # statement ran not the if statement same with the system commands but not theme (FIXED)
       if vars.disable_ticks.lower() == 'true' or vars.disable_ticks == 'NULL':
         text = input(f'{vars.ticker}. ')
-      if vars.disable_ticks.lower() == 'false':
+      else:
         text = input('> ')
 
       # ARGUMENT HANDLER #
@@ -445,6 +454,15 @@ if __name__ == '__main__':
         if extension == '.py':
           mode = 'INTERPRETED'
         print(f'{vars.version} | {mode} at {directory}')
+
+      elif text.lower().split(' ')[0] == '::_dump':
+        all_vars = dir()
+        for item in all_vars:
+          if not item.startswith('__'):
+            value = eval(item)
+            print(f'{item} {type(value)} = {value}')
+          else:
+            print(item)
 
       elif '::' in text.lower().split(' ')[0]:
         print(f'The given command {text.lower().split(" ")[0]} is not valid in this mode, try opening a file.')
