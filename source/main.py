@@ -1,4 +1,5 @@
 # This is written in kinda my own style with the help of the replit Python formatter
+# TODO: Maybe add a way for the user to print the repr of any variable or object
 
 try:
   import os, sys
@@ -12,9 +13,11 @@ except Exception as e:
 class vars:
   version = '0.3 Pre-Alpha'  # Side project -> Github repo
   now = lambda: os.popen('time /t').read().replace('\n', '')
+  config_file = f'{os.getcwd()}/config'  # Used by checks()
   platform = sys.platform
-  disable_commands = None
-  disable_ticks = None
+  # NULL is a string placeholder for None
+  disable_commands = 'NULL'
+  disable_ticks = 'NULL'
   output_log = []
   user_vars = []
   ticker = 0
@@ -54,7 +57,7 @@ class lib:
   def checks():
     # Add a way for users to create a simple file like 'config' that when detected
     # will apply the given settings before lanuch so like changing the theme or
-    # removing the numer ticks or disabling system commands EDIT: ln(50~90)
+    # removing the numer ticks or disabling system commands EDIT: ln(50~100)
     if 'linux' in vars.platform:
       print(f"\n------------------------------------------------ \
       \nTHIS PROGRAM IS ONLY COMPATIBLE WITH WINDOWS. \
@@ -70,7 +73,9 @@ class lib:
       else:
         print('Given input not recognized, quitting...')
         sys.exit(0)
-    elif os.path.exists(f'{os.getcwd()}/config'):
+    elif os.path.exists(vars.config_file):
+      if os.path.getsize(vars.config_file) != 0:
+        print(f'Configured by {vars.config_file}')
       # theme: blue white     (IMPLEMENTED)
       # number-ticks: false   (IMPLEMENTED)
       # commands: false       (IMPLEMENTED)
@@ -78,7 +83,7 @@ class lib:
         content = f.read()
         f.close()
 
-      for line in content.split('\n'):
+      for line in content.splitlines():
         if 'theme' in line:
           index = line.find(': ')
           theme_settings = line[index:].replace(': ', '')
@@ -89,11 +94,11 @@ class lib:
         if 'number-ticks' in line:
           index = line.find(': ')
           boolean = line[index:].replace(': ', '')
-          vars.disable_ticks = bool(boolean)
+          vars.disable_ticks = boolean
         if 'commands' in line:
           index = line.find(': ')
           boolean = line[index:].replace(': ', '')
-          vars.disable_commands = bool(boolean)
+          vars.disable_commands = boolean
 
   def createVar(text):
     if len(text.split(' ')) == 4:
@@ -301,7 +306,7 @@ class lib:
 
   def changeTheme(param=None):
     # I coded this so param and text are interchangeable to account for cases where
-    # the user may not have typed yet so like config theme switches
+    # the user may not have typed yet so like configured theme switches
     if not 'text' in locals():
       text = param
     elif not 'param' in locals():
@@ -363,10 +368,10 @@ if __name__ == '__main__':
     while True:
       vars.ticker += 1
       # On Linux when i was testing this i removed the lines from the file and the else
-      # statement ran not the if statement same with the system commands but not theme...
-      if vars.disable_ticks == True:
+      # statement ran not the if statement same with the system commands but not theme (FIXED)
+      if vars.disable_ticks.lower() == 'true' or vars.disable_ticks == 'NULL':
         text = input(f'{vars.ticker}. ')
-      else:
+      if vars.disable_ticks.lower() == 'false':
         text = input('> ')
 
       # ARGUMENT HANDLER #
@@ -401,7 +406,7 @@ if __name__ == '__main__':
           print('No string provided, Example(::log Python Is Better).')
 
       elif text.lower().split(' ')[0] == '::system':
-        if vars.disable_commands == False:
+        if vars.disable_commands.lower() == 'true' or vars.disable_commands == 'NULL':
           if len(text.split(' ')) > 1:
             command = ' '.join(text.lower().split(' ')[1:])
             os.system(command)
@@ -410,7 +415,7 @@ if __name__ == '__main__':
         else:
           print('System commands have been disabled by configuration, create \
           \na config file and type (commands: false) without parentheses \
-          \nto enable them or delete the file.')
+          \nto enable them or just delete the file.')
 
       elif text.lower().split(' ')[0] == '::theme':
         if len(text.split(' ')) > 1:
