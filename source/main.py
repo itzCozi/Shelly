@@ -68,7 +68,7 @@ class lib:
       else:
         print('Given input not recognized, quitting...')
         sys.exit(0)
-    elif os.path.exists(f'{os.getcwd}/startup.py') or os.path.exists(f'{os.getcwd}/startup.exe'):
+    elif os.path.exists(f'{os.getcwd()}/config'):
       user_input = input(f'A startup file has been found, run it? (y/n) ')
       if user_input.lower() == 'y' or user_input.lower() == 'yes':
         print('Running: startup.py')
