@@ -1,5 +1,6 @@
 # This is written in kinda my own style with the help of the replit Python formatter
-# TODO: Add a way for the user to print all user made vars in an opened file
+# TODO: Create a config command for removing the 'Configured by <FILE>' print statement (❌)
+# TODO: Add a way for the user to print all user made vars in an opened file (❌)
 
 try:
   import os, sys
@@ -366,7 +367,7 @@ class lib:
         if text.lower().split(' ')[2] == 'white' or param.lower().split(' ')[2] == 'white':
           foreground_color = '7'
       # It's over now, you can open your eyes.
-      
+
       if 'background_color' and 'foreground_color' in locals():  # Prevent unbound error
         os.system(f'Color {background_color}{foreground_color}')
       else:
@@ -437,8 +438,16 @@ if __name__ == '__main__':
           print('Please pass 2 colors, Example(::theme blue white).')
 
       # SPECIAL SWITCHES #
+      elif text.lower() == '::_reset':
+        lib.clearPad()
+        vars.output_log.clear()
+        vars.user_vars.clear()
+
       elif text.lower() == '::_logged':
-        print('\n'.join(vars.output_log))
+        if len(vars.output_log) == 0:
+          print('No logged text found.')
+        else:
+          print('\n'.join(vars.output_log))
 
       elif text.lower() == '::_version':
         extension = __file__.split('\\')[-1][__file__.split('\\')[-1].find('.'):]
