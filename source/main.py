@@ -1,6 +1,4 @@
 # This is written in kinda my own style with the help of the replit Python formatter
-# TODO: Create a config command for removing the 'Configured by <FILE>' print statement (❌)
-# TODO: Add a way for the user to print all user made vars in an opened file (❌)
 
 try:
   import os, sys
@@ -17,6 +15,7 @@ class vars:
   config_file = f'{os.getcwd()}/config'.replace('\\', '/')
   platform = sys.platform
   # NULL is a string placeholder for None
+  disable_config_print = 'NULL'
   disable_commands = 'NULL'
   disable_ticks = 'NULL'
   output_log = []
@@ -56,9 +55,6 @@ class lib:
     vars.ticker = 0
 
   def checks():
-    # Add a way for users to create a simple file like 'config' that when detected
-    # will apply the given settings before lanuch so like changing the theme or
-    # removing the numer ticks or disabling system commands EDIT: ln(50~100)
     if 'linux' in vars.platform:
       print(f"\n------------------------------------------------ \
       \nTHIS PROGRAM IS ONLY COMPATIBLE WITH WINDOWS. \
@@ -75,11 +71,10 @@ class lib:
         print('Given input not recognized, quitting...')
         sys.exit(0)
     elif os.path.exists(vars.config_file):
-      if os.path.getsize(vars.config_file) != 0:
-        print(f'Configured by {vars.config_file}')
       # theme: blue white     (IMPLEMENTED)
       # number-ticks: false   (IMPLEMENTED)
       # commands: false       (IMPLEMENTED)
+      # print-config: false   (IMPLEMENTED)
       with open('config', 'r') as f:
         content = f.read()
         f.close()
@@ -96,14 +91,24 @@ class lib:
             colorA = theme_settings.split(' ')[0]
             parameter = f'::theme {colorA}'
           lib.changeTheme(parameter)
-        if 'number-ticks' in line:
+        elif 'number-ticks' in line:
           index = line.find(': ')
           boolean = line[index:].replace(': ', '')
           vars.disable_ticks = boolean
-        if 'commands' in line:
+        elif 'commands' in line:
           index = line.find(': ')
           boolean = line[index:].replace(': ', '')
           vars.disable_commands = boolean
+        elif 'print-config' in line:
+          index = line.find(': ')
+          boolean = line[index:].replace(': ', '')
+          vars.disable_config_print = boolean
+        else:
+          continue
+
+      if os.path.getsize(vars.config_file) != 0:
+        if vars.disable_config_print.lower() == 'true' or vars.disable_config_print == 'NULL':
+          print(f'Configured by {vars.config_file}')
 
   def createVar(text):
     if len(text.split(' ')) == 4:
@@ -244,6 +249,12 @@ class lib:
             break
           elif text.lower().split(' ')[0] == '::var':
             lib.createVar(text)
+          elif text.lower().split(' ')[0] == '::vars':
+            if len(vars.user_vars) != 0:
+              for i in vars.user_vars:
+                print(i)
+            else:
+              print("No vars made use '::var name = value' to create vars.")
           elif text.lower().split(' ')[0] == '::wipe':
             YorN = input('Are you sure you want to wipe this file? (y/n) ')
             if YorN.lower() == 'yes' or YorN.lower() == 'y':
