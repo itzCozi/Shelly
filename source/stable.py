@@ -1,4 +1,4 @@
-# ALL CODE COMMITED TO THIS FILE IS FORMATTED TO BLACK-PYTHON (SEE README BADGE)
+# This is written in kinda my own style with the help of the replit Python formatter
 
 try:
     import os, sys
@@ -10,8 +10,14 @@ except Exception as e:
 
 
 class vars:
-    version = "0.3 Pre-Alpha"  # Side project -> Github repo
+    version = "0.4 Pre-Alpha"  # Side project -> Github repo
     now = lambda: os.popen("time /t").read().replace("\n", "")
+    config_file = f"{os.getcwd()}/config".replace("\\", "/")
+    platform = sys.platform
+    # NULL is a string placeholder for None
+    disable_config_print = "NULL"
+    disable_commands = "NULL"
+    disable_ticks = "NULL"
     output_log = []
     user_vars = []
     ticker = 0
@@ -48,6 +54,67 @@ class lib:
     def clearPad():
         os.system("cls")
         vars.ticker = 0
+
+    def checks():
+        if "linux" in vars.platform:
+            print(
+                f"\n------------------------------------------------ \
+      \nTHIS PROGRAM IS ONLY COMPATIBLE WITH WINDOWS. \
+      \nSOME ISSUES MAY BE ENCOUNTERED, CONTINUE? \
+      \n------------------------------------------------"
+            )
+            user_input = input("(y/n)> ")
+            if user_input.lower() == "y" or user_input.lower() == "yes":
+                print("\nYIELDING...")
+                vars.platform = "yielded"
+            elif user_input.lower() == "n" or user_input.lower() == "no":
+                print("\nQUITTING...")
+                sys.exit(1)
+            else:
+                print("Given input not recognized, quitting...")
+                sys.exit(0)
+        elif os.path.exists(vars.config_file):
+            # theme: blue white     (IMPLEMENTED)
+            # number-ticks: false   (IMPLEMENTED)
+            # commands: false       (IMPLEMENTED)
+            # print-config: false   (IMPLEMENTED)
+            with open("config", "r") as f:
+                content = f.read()
+                f.close()
+
+            for line in content.splitlines():
+                if "theme" in line:
+                    index = line.find(": ")
+                    theme_settings = line[index:].replace(": ", "")
+                    if len(theme_settings.split(" ")) == 2:
+                        colorA = theme_settings.split(" ")[0]
+                        colorB = theme_settings.split(" ")[1]
+                        parameter = f"::theme {colorA} {colorB}"
+                    else:
+                        colorA = theme_settings.split(" ")[0]
+                        parameter = f"::theme {colorA}"
+                    lib.changeTheme(parameter)
+                elif "number-ticks" in line:
+                    index = line.find(": ")
+                    boolean = line[index:].replace(": ", "")
+                    vars.disable_ticks = boolean
+                elif "commands" in line:
+                    index = line.find(": ")
+                    boolean = line[index:].replace(": ", "")
+                    vars.disable_commands = boolean
+                elif "print-config" in line:
+                    index = line.find(": ")
+                    boolean = line[index:].replace(": ", "")
+                    vars.disable_config_print = boolean
+                else:
+                    continue
+
+            if os.path.getsize(vars.config_file) != 0:
+                if (
+                    vars.disable_config_print.lower() == "true"
+                    or vars.disable_config_print == "NULL"
+                ):
+                    print(f"Configured by {vars.config_file}")
 
     def createVar(text):
         if len(text.split(" ")) == 4:
@@ -154,7 +221,13 @@ class lib:
                 for line in content.splitlines():
                     vars.ticker += 1
                     vars.output_log.append(line)
-                    print(f"{vars.ticker}. {line}")
+                    if (
+                        vars.disable_ticks.lower() == "true"
+                        or vars.disable_ticks == "NULL"
+                    ):
+                        print(f"{vars.ticker}. {line}")
+                    else:
+                        print(f"> {line}")
                 save.close()
             print(f"Loaded text from {save_file}")
         else:
@@ -178,12 +251,26 @@ class lib:
             def openLoop():
                 while True:
                     vars.ticker += 1
-                    text = input(f"{vars.ticker}. ")
+                    if (
+                        vars.disable_ticks.lower() == "true"
+                        or vars.disable_ticks == "NULL"
+                    ):
+                        text = input(f"{vars.ticker}. ")
+                    else:
+                        text = input("> ")
                     if text.lower() == "::close":
                         print(f"Closed: {file}")
                         break
                     elif text.lower().split(" ")[0] == "::var":
                         lib.createVar(text)
+                    elif text.lower().split(" ")[0] == "::vars":
+                        if len(vars.user_vars) != 0:
+                            for i in vars.user_vars:
+                                print(i)
+                        else:
+                            print(
+                                "No vars made use '::var name = value' to create vars."
+                            )
                     elif text.lower().split(" ")[0] == "::wipe":
                         YorN = input("Are you sure you want to wipe this file? (y/n) ")
                         if YorN.lower() == "yes" or YorN.lower() == "y":
@@ -217,11 +304,7 @@ class lib:
                                         ]
                                         value = ripped_statement.split(" ")[2]
                                 if "value" in locals():
-                                    text = (
-                                        text.replace(var, value)
-                                        .replace("<", "")
-                                        .replace(">", "")
-                                    )
+                                    text = text.replace(f"<{var}>", value)
                         if os.path.getsize(path) == 0:
                             write_back = f"{text}"
                         if os.path.getsize(path) != 0:
@@ -236,7 +319,13 @@ class lib:
                         content = r.read()
                         for line in content.splitlines():
                             vars.ticker += 1
-                            print(f"{vars.ticker}. {line}")
+                            if (
+                                vars.disable_ticks.lower() == "true"
+                                or vars.disable_ticks == "NULL"
+                            ):
+                                print(f"{vars.ticker}. {line}")
+                            else:
+                                print(f"> {line}")
                     openLoop()
 
                 if not os.path.exists(file):
@@ -250,7 +339,13 @@ class lib:
                         content = r.read()
                         for line in content.splitlines():
                             vars.ticker += 1
-                            print(f"{vars.ticker}. {line}")
+                            if (
+                                vars.disable_ticks.lower() == "true"
+                                or vars.disable_ticks == "NULL"
+                            ):
+                                print(f"{vars.ticker}. {line}")
+                            else:
+                                print(f"> {line}")
                     openLoop()
 
                 if not os.path.exists(file):
@@ -266,47 +361,106 @@ class lib:
             time.sleep(3)
             return 0
 
-    def changeTheme():
+    def changeTheme(param):
+        # I coded this so param and text are interchangeable to account for cases where
+        # the user may not have typed yet so like configured theme switches
+        if not "text" in locals():
+            text = param
+        elif not "param" in locals():
+            param = text
         try:
-            if text.lower().split(" ")[1] == "random":
+            # Cover your eyes! i'll tell you when it's over.
+            if (
+                text.lower().split(" ")[1] == "random"
+                or param.lower().split(" ")[1] == "random"
+            ):
                 background_color = random.randint(0, 7)
                 foreground_color = random.randint(0, 7)
 
-            if len(text.split(" ")) > 1:
-                if text.lower().split(" ")[1] == "black":
+            if len(text.split(" ")) > 1 or len(param.split(" ")) > 1:
+                if (
+                    text.lower().split(" ")[1] == "black"
+                    or param.lower().split(" ")[1] == "black"
+                ):
                     background_color = "0"
-                if text.lower().split(" ")[1] == "blue":
+                if (
+                    text.lower().split(" ")[1] == "blue"
+                    or param.lower().split(" ")[1] == "blue"
+                ):
                     background_color = "1"
-                if text.lower().split(" ")[1] == "green":
+                if (
+                    text.lower().split(" ")[1] == "green"
+                    or param.lower().split(" ")[1] == "green"
+                ):
                     background_color = "2"
-                if text.lower().split(" ")[1] == "cyan":
+                if (
+                    text.lower().split(" ")[1] == "cyan"
+                    or param.lower().split(" ")[1] == "cyan"
+                ):
                     background_color = "3"
-                if text.lower().split(" ")[1] == "red":
+                if (
+                    text.lower().split(" ")[1] == "red"
+                    or param.lower().split(" ")[1] == "red"
+                ):
                     background_color = "4"
-                if text.lower().split(" ")[1] == "purple":
+                if (
+                    text.lower().split(" ")[1] == "purple"
+                    or param.lower().split(" ")[1] == "purple"
+                ):
                     background_color = "5"
-                if text.lower().split(" ")[1] == "yellow":
+                if (
+                    text.lower().split(" ")[1] == "yellow"
+                    or param.lower().split(" ")[1] == "yellow"
+                ):
                     background_color = "6"
-                if text.lower().split(" ")[1] == "white":
+                if (
+                    text.lower().split(" ")[1] == "white"
+                    or param.lower().split(" ")[1] == "white"
+                ):
                     background_color = "7"
 
-            if len(text.split(" ")) > 2:
-                if text.lower().split(" ")[2] == "black":
+            if len(text.split(" ")) > 2 or len(param.split(" ")) > 2:
+                if (
+                    text.lower().split(" ")[2] == "black"
+                    or param.lower().split(" ")[2] == "black"
+                ):
                     foreground_color = "0"
-                if text.lower().split(" ")[2] == "blue":
+                if (
+                    text.lower().split(" ")[2] == "blue"
+                    or param.lower().split(" ")[2] == "blue"
+                ):
                     foreground_color = "1"
-                if text.lower().split(" ")[2] == "green":
+                if (
+                    text.lower().split(" ")[2] == "green"
+                    or param.lower().split(" ")[2] == "green"
+                ):
                     foreground_color = "2"
-                if text.lower().split(" ")[1] == "cyan":
+                if (
+                    text.lower().split(" ")[1] == "cyan"
+                    or param.lower().split(" ")[2] == "cyan"
+                ):
                     foreground_color = "3"
-                if text.lower().split(" ")[2] == "red":
+                if (
+                    text.lower().split(" ")[2] == "red"
+                    or param.lower().split(" ")[2] == "red"
+                ):
                     foreground_color = "4"
-                if text.lower().split(" ")[2] == "purple":
+                if (
+                    text.lower().split(" ")[2] == "purple"
+                    or param.lower().split(" ")[2] == "purple"
+                ):
                     foreground_color = "5"
-                if text.lower().split(" ")[2] == "yellow":
+                if (
+                    text.lower().split(" ")[2] == "yellow"
+                    or param.lower().split(" ")[2] == "yellow"
+                ):
                     foreground_color = "6"
-                if text.lower().split(" ")[2] == "white":
+                if (
+                    text.lower().split(" ")[2] == "white"
+                    or param.lower().split(" ")[2] == "white"
+                ):
                     foreground_color = "7"
+            # It's over now, you can open your eyes.
 
             if (
                 "background_color" and "foreground_color" in locals()
@@ -322,9 +476,13 @@ class lib:
 
 if __name__ == "__main__":
     try:
+        lib.checks()  # Handles pre-run
         while True:
             vars.ticker += 1
-            text = input(f"{vars.ticker}. ")
+            if vars.disable_ticks.lower() == "true" or vars.disable_ticks == "NULL":
+                text = input(f"{vars.ticker}. ")
+            else:
+                text = input("> ")
 
             # ARGUMENT HANDLER #
             if text.lower() == "::help":
@@ -358,21 +516,39 @@ if __name__ == "__main__":
                     print("No string provided, Example(::log Python Is Better).")
 
             elif text.lower().split(" ")[0] == "::system":
-                if len(text.split(" ")) > 1:
-                    command = " ".join(text.lower().split(" ")[1:])
-                    os.system(command)
+                if (
+                    vars.disable_commands.lower() == "true"
+                    or vars.disable_commands == "NULL"
+                ):
+                    if len(text.split(" ")) > 1:
+                        command = " ".join(text.lower().split(" ")[1:])
+                        os.system(command)
+                    else:
+                        print("No command given, Example(::system time /t).")
                 else:
-                    print("No command given, Example(::system time /t).")
+                    print(
+                        "System commands have been disabled by configuration, create \
+          \na config file and type (commands: false) without parentheses \
+          \nto enable them or just delete the file."
+                    )
 
             elif text.lower().split(" ")[0] == "::theme":
                 if len(text.split(" ")) > 1:
-                    lib.changeTheme()
+                    lib.changeTheme(text)
                 else:
                     print("Please pass 2 colors, Example(::theme blue white).")
 
             # SPECIAL SWITCHES #
+            elif text.lower() == "::_reset":
+                lib.clearPad()
+                vars.output_log.clear()
+                vars.user_vars.clear()
+
             elif text.lower() == "::_logged":
-                print("\n".join(vars.output_log))
+                if len(vars.output_log) == 0:
+                    print("No logged text found.")
+                else:
+                    print("\n".join(vars.output_log))
 
             elif text.lower() == "::_version":
                 extension = __file__.split("\\")[-1][
@@ -390,6 +566,15 @@ if __name__ == "__main__":
                 if extension == ".py":
                     mode = "INTERPRETED"
                 print(f"{vars.version} | {mode} at {directory}")
+
+            elif text.lower().split(" ")[0] == "::_dump":
+                all_vars = dir()
+                for item in all_vars:
+                    if not item.startswith("__"):
+                        value = eval(item)
+                        print(f"{item} {type(value)} = {value}")
+                    else:
+                        print(item)
 
             elif "::" in text.lower().split(" ")[0]:
                 print(
