@@ -10,7 +10,7 @@ except Exception as e:
 
 
 class vars:
-  version = '0.3 Pre-Alpha'  # Side project -> Github repo
+  version = '0.4 Pre-Alpha'  # Side project -> Github repo
   now = lambda: os.popen('time /t').read().replace('\n', '')
   config_file = f'{os.getcwd()}/config'.replace('\\', '/')
   platform = sys.platform
@@ -278,7 +278,7 @@ class lib:
                     ripped_statement = vars.user_vars[vars.user_vars.index(i)]
                     value = ripped_statement.split(' ')[2]
                 if 'value' in locals():
-                  text = text.replace(var, value).replace('<', '').replace('>', '')
+                  text = text.replace(f'<{var}>', value).replace('<', '').replace('>', '')
             if os.path.getsize(path) == 0:
               write_back = f'{text}'
             if os.path.getsize(path) != 0:
