@@ -278,7 +278,7 @@ class lib:
                     ripped_statement = vars.user_vars[vars.user_vars.index(i)]
                     value = ripped_statement.split(' ')[2]
                 if 'value' in locals():
-                  text = text.replace(f'<{var}>', value).replace('<', '').replace('>', '')
+                  text = text.replace(f'<{var}>', value)
             if os.path.getsize(path) == 0:
               write_back = f'{text}'
             if os.path.getsize(path) != 0:
