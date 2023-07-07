@@ -145,6 +145,7 @@ class lib:
       print('No time given, Example(::stall 9) this will wait 9 seconds.')
 
   def quitProcess():
+    # WARNING: This also needs to be altered depending on what linux_compatibility_mode is 
     os.system('Color C7')
     check = input('Are you sure you want to quit? (y/n): ')
     if check.lower() == 'yes' or check.lower() == 'y':
