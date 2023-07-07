@@ -4,6 +4,9 @@
 # usable so the '::theme' command will be unusable while '::time' and '::clear' only
 # have to be changed depending on the variables value (IN-DEVELOPMENT)
 
+# CLEAR-COMMAND-LINUX: clear (dont forget to set ticker to 0)
+# TIME-COMMAND-LINUX: date +%I:%M' '%p
+
 try:
   import os, sys
   import time
