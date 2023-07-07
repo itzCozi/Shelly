@@ -1,4 +1,8 @@
 # This is written in kinda my own style with the help of the replit Python formatter
+# TODO: Maybe add a linux boolean to the config file and if ran with this set to true 
+# the linux checks, themes and other commands that dont work on linux will not be
+# usable so the '::theme' command will be unusable while '::time' and '::clear' only
+# have to be changed depending on the variables value (IN-DEVELOPMENT)
 
 try:
   import os, sys
@@ -15,6 +19,7 @@ class vars:
   config_file = f'{os.getcwd()}/config'.replace('\\', '/')
   platform = sys.platform
   # NULL is a string placeholder for None
+  linux_compatibility_mode = 'NULL'
   disable_config_print = 'NULL'
   disable_commands = 'NULL'
   disable_ticks = 'NULL'
@@ -70,11 +75,12 @@ class lib:
       else:
         print('Given input not recognized, quitting...')
         sys.exit(0)
-    elif os.path.exists(vars.config_file):
+    if os.path.exists(vars.config_file):
       # theme: blue white     (IMPLEMENTED)
       # number-ticks: false   (IMPLEMENTED)
       # commands: false       (IMPLEMENTED)
       # print-config: false   (IMPLEMENTED)
+      # linux: true           (DEVELOPMENT)
       with open('config', 'r') as f:
         content = f.read()
         f.close()
@@ -91,6 +97,11 @@ class lib:
             colorA = theme_settings.split(' ')[0]
             parameter = f'::theme {colorA}'
           lib.changeTheme(parameter)
+        elif 'linux' in line:
+          print('LINUX COMPATIBILITY MODE IS IN DEVELOPMENT.')
+          index = line.find(': ')
+          boolean = line[index:].replace(': ', '')
+          vars.linux_compatibility_mode = boolean
         elif 'number-ticks' in line:
           index = line.find(': ')
           boolean = line[index:].replace(': ', '')
