@@ -1,11 +1,4 @@
 # This is written in kinda my own style with the help of the replit Python formatter
-# TODO: Maybe add a linux boolean to the config file and if ran with this set to true 
-# the linux checks, themes and other commands that dont work on linux will not be
-# usable so the '::theme' command will be unusable while '::time' and '::clear' only
-# have to be changed depending on the variables value (IN-DEVELOPMENT)
-
-# CLEAR-COMMAND-LINUX: clear (dont forget to set ticker to 0)
-# TIME-COMMAND-LINUX: date +%I:%M' '%p
 
 try:
   import os, sys
@@ -22,8 +15,8 @@ class vars:
   config_file = f'{os.getcwd()}/config'.replace('\\', '/')
   platform = sys.platform
   # NULL is a string placeholder for None
-  linux_compatibility_mode = 'NULL'
   disable_config_print = 'NULL'
+  linux_compatibility = 'NULL'
   disable_commands = 'NULL'
   disable_ticks = 'NULL'
   output_log = []
@@ -63,27 +56,15 @@ class lib:
     vars.ticker = 0
 
   def checks():
-    if 'linux' in vars.platform:
-      print(f"\n------------------------------------------------ \
-      \nTHIS PROGRAM IS ONLY COMPATIBLE WITH WINDOWS. \
-      \nSOME ISSUES MAY BE ENCOUNTERED, CONTINUE? \
-      \n------------------------------------------------")
-      user_input = input('(y/n)> ')
-      if user_input.lower() == 'y' or user_input.lower() == 'yes':
-        print('\nYIELDING...')
-        vars.platform = 'yielded'
-      elif user_input.lower() == 'n' or user_input.lower() == 'no':
-        print('\nQUITTING...')
-        sys.exit(1)
-      else:
-        print('Given input not recognized, quitting...')
-        sys.exit(0)
+    if os.path.getsize(vars.config_file) != 0:
+      if vars.disable_config_print.lower() == 'true' or vars.disable_config_print == 'NULL':
+        print(f'Configured by {vars.config_file}')
     if os.path.exists(vars.config_file):
       # theme: blue white     (IMPLEMENTED)
       # number-ticks: false   (IMPLEMENTED)
       # commands: false       (IMPLEMENTED)
       # print-config: false   (IMPLEMENTED)
-      # linux: true           (DEVELOPMENT)
+      # linux: true           (IMPLEMENTED)
       with open('config', 'r') as f:
         content = f.read()
         f.close()
@@ -101,10 +82,9 @@ class lib:
             parameter = f'::theme {colorA}'
           lib.changeTheme(parameter)
         elif 'linux' in line:
-          print('LINUX COMPATIBILITY MODE IS IN DEVELOPMENT.')
           index = line.find(': ')
           boolean = line[index:].replace(': ', '')
-          vars.linux_compatibility_mode = boolean
+          vars.linux_compatibility = boolean
         elif 'number-ticks' in line:
           index = line.find(': ')
           boolean = line[index:].replace(': ', '')
@@ -120,9 +100,22 @@ class lib:
         else:
           continue
 
-      if os.path.getsize(vars.config_file) != 0:
-        if vars.disable_config_print.lower() == 'true' or vars.disable_config_print == 'NULL':
-          print(f'Configured by {vars.config_file}')
+    if vars.linux_compatibility.lower() == 'false' or vars.linux_compatibility == 'NULL':
+      if 'linux' in vars.platform:
+        print(f"\n------------------------------------------------ \
+        \nTHIS PROGRAM IS ONLY COMPATIBLE WITH WINDOWS. \
+        \nSOME ISSUES MAY BE ENCOUNTERED, CONTINUE? \
+        \n------------------------------------------------")
+        user_input = input('(y/n)> ')
+        if user_input.lower() == 'y' or user_input.lower() == 'yes':
+          print('\nYIELDING...')
+          vars.platform = 'yielded'
+        elif user_input.lower() == 'n' or user_input.lower() == 'no':
+          print('\nQUITTING...')
+          sys.exit(1)
+        else:
+          print('Given input not recognized, quitting...')
+          sys.exit(0)
 
   def createVar(text):
     if len(text.split(' ')) == 4:
@@ -148,18 +141,25 @@ class lib:
       print('No time given, Example(::stall 9) this will wait 9 seconds.')
 
   def quitProcess():
-    # WARNING: This also needs to be altered depending on what linux_compatibility_mode is 
-    os.system('Color C7')
+    if vars.linux_compatibility.lower() == 'false' or vars.linux_compatibility == 'NULL':
+      shorthand = True
+    else:
+      shorthand = False
+
+    if shorthand:
+      os.system('Color C7')
     check = input('Are you sure you want to quit? (y/n): ')
     if check.lower() == 'yes' or check.lower() == 'y':
       print('Quitting...')
       time.sleep(1)
-      os.system('Color 07')
+      if shorthand:
+        os.system('Color 07')
       sys.exit(0)
     elif check.lower() == 'no' or check.lower() == 'n':
       print('Aborting...')
       time.sleep(1)
-      os.system('Color 07')
+      if shorthand:
+        os.system('Color 07')
     else:
       print('Given input not recognized, restarting.')
       lib.quitProcess()
@@ -422,10 +422,17 @@ if __name__ == '__main__':
         lib.quitProcess()
 
       elif text.lower() == '::clear':
-        lib.clearPad()
+        if vars.linux_compatibility.lower() == 'false' or vars.linux_compatibility == 'NULL':
+          lib.clearPad()
+        else:
+          os.system('clear')
+          vars.ticker = 0
 
       elif text.lower() == '::time':
-        print(vars.now())
+        if vars.linux_compatibility.lower() == 'false' or vars.linux_compatibility == 'NULL':
+          print(vars.now())
+        else:
+          os.system("date +%I:%M' '%p")  # Returns: 12:00 AM
 
       elif text.lower().split(' ')[0] == '::stall':
         lib.stall()
@@ -458,10 +465,13 @@ if __name__ == '__main__':
           \nto enable them or just delete the file.')
 
       elif text.lower().split(' ')[0] == '::theme':
-        if len(text.split(' ')) > 1:
-          lib.changeTheme(text)
+        if vars.linux_compatibility.lower() == 'false' or vars.linux_compatibility == 'NULL':
+          if len(text.split(' ')) > 1:
+            lib.changeTheme(text)
+          else:
+            print('Please pass 2 colors, Example(::theme blue white).')
         else:
-          print('Please pass 2 colors, Example(::theme blue white).')
+          print('Theme changes are prohibited in linux compatibility mode.')
 
       # SPECIAL SWITCHES #
       elif text.lower() == '::_reset':
