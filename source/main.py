@@ -52,13 +52,14 @@ class lib:
     ''')
 
   def clearPad():
-    os.system('cls')
-    vars.ticker = 0
+    if vars.linux_compatibility.lower() == 'false' or vars.linux_compatibility == 'NULL':
+      os.system('cls')
+      vars.ticker = 0
+    else:
+      os.system('clear')
+      vars.ticker = 0
 
   def checks():
-    if os.path.getsize(vars.config_file) != 0:
-      if vars.disable_config_print.lower() == 'true' or vars.disable_config_print == 'NULL':
-        print(f'Configured by {vars.config_file}')
     if os.path.exists(vars.config_file):
       # theme: blue white     (IMPLEMENTED)
       # number-ticks: false   (IMPLEMENTED)
@@ -99,6 +100,9 @@ class lib:
           vars.disable_config_print = boolean
         else:
           continue
+
+    if os.path.getsize(vars.config_file) != 0 and vars.disable_config_print.lower() == 'true' or vars.disable_config_print == 'NULL':
+      print(f'Configured by {vars.config_file}')
 
     if vars.linux_compatibility.lower() == 'false' or vars.linux_compatibility == 'NULL':
       if 'linux' in vars.platform:
@@ -422,11 +426,7 @@ if __name__ == '__main__':
         lib.quitProcess()
 
       elif text.lower() == '::clear':
-        if vars.linux_compatibility.lower() == 'false' or vars.linux_compatibility == 'NULL':
-          lib.clearPad()
-        else:
-          os.system('clear')
-          vars.ticker = 0
+        lib.clearPad()
 
       elif text.lower() == '::time':
         if vars.linux_compatibility.lower() == 'false' or vars.linux_compatibility == 'NULL':
