@@ -37,7 +37,7 @@ class lib:
   ::load(file) - Load text from a file.
   ::log(text) - Writes given text to the console.
   ::system(cmd) - Passes a command to the computer.
-  ::theme(color color) - Changes the console's color.
+  ::theme(color color) - Changes the console's color. LINUX ONLY
   ::open(file) - Displays file contents and writes all lines to file.
   ::close - Exits file and returns to normal mode.
   ::wipe - Clears all data from current file.
@@ -71,7 +71,7 @@ class lib:
         f.close()
 
       for line in content.splitlines():
-        if 'theme' in line:
+        if 'theme' in line.lower():
           index = line.find(': ')
           theme_settings = line[index:].replace(': ', '')
           if len(theme_settings.split(' ')) == 2:
@@ -82,19 +82,19 @@ class lib:
             colorA = theme_settings.split(' ')[0]
             parameter = f'::theme {colorA}'
           lib.changeTheme(parameter)
-        elif 'linux' in line:
+        elif 'linux' in line.lower():
           index = line.find(': ')
           boolean = line[index:].replace(': ', '')
           vars.linux_compatibility = boolean
-        elif 'number-ticks' in line:
+        elif 'number-ticks' in line.lower():
           index = line.find(': ')
           boolean = line[index:].replace(': ', '')
           vars.disable_ticks = boolean
-        elif 'commands' in line:
+        elif 'commands' in line.lower():
           index = line.find(': ')
           boolean = line[index:].replace(': ', '')
           vars.disable_commands = boolean
-        elif 'print-config' in line:
+        elif 'print-config' in line.lower():
           index = line.find(': ')
           boolean = line[index:].replace(': ', '')
           vars.disable_config_print = boolean
@@ -106,14 +106,14 @@ class lib:
 
     if vars.linux_compatibility.lower() == 'false' or vars.linux_compatibility == 'NULL':
       if 'linux' in vars.platform:
-        print(f"\n------------------------------------------------ \
-        \nTHIS PROGRAM IS ONLY COMPATIBLE WITH WINDOWS. \
-        \nSOME ISSUES MAY BE ENCOUNTERED, CONTINUE? \
-        \n------------------------------------------------")
+        print(f"\n------------------------------------------------- \
+        \nTHIS PROGRAM IS DESIGNED FOR USE WITH WINDOWS. \
+        \nCONTINUE WITH LINUX COMPATIBILITY MODE TOGGLED? \
+        \n-------------------------------------------------")
         user_input = input('(y/n)> ')
         if user_input.lower() == 'y' or user_input.lower() == 'yes':
           print('\nYIELDING...')
-          vars.platform = 'yielded'
+          vars.linux_compatibility = 'true' ; vars.platform = 'yielded'
         elif user_input.lower() == 'n' or user_input.lower() == 'no':
           print('\nQUITTING...')
           sys.exit(1)
@@ -182,7 +182,7 @@ class lib:
       elif os.path.exists(directory):
         save_file = f'{path}'
       else:
-        print(f'The folder {directory} does not exist.')
+        print(f'The folder {directory} does not exist, using current directory.')
         save_file = f'{os.getcwd()}/save.txt'
         time.sleep(3)
     else:
@@ -190,7 +190,7 @@ class lib:
     save_file = save_file.replace('\\', '/')
 
     if os.path.exists(save_file):
-      overwrite = input(f'File {file} already exists, overwrite it? (y/n) ')
+      overwrite = input(f"File {save_file.split('/')[-1]} already exists, overwrite it? (y/n) ")
       if overwrite.lower() == 'yes' or overwrite.lower() == 'y':
         os.remove(save_file)
       elif overwrite.lower() == 'no' or overwrite.lower() == 'n':
@@ -515,6 +515,10 @@ if __name__ == '__main__':
       else:
         vars.output_log.append(text)
 
+  except PermissionError:
+    print('Action taken without the required permissions please \
+    run this program as administrator to enact attempted action.')
+    time.sleep(3)
   except Exception as e:
     print(f'ERROR: {e}')
     time.sleep(3)
