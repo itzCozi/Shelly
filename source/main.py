@@ -1,5 +1,6 @@
 # This is written in kinda my own style with the help of the replit Python formatter
 # TODO: Look over and test then reformat with black to compile and release 1.0
+# TODO: Also edit save files zip with python (write a script idk have fun)
 
 try:
   import os, sys
